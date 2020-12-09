@@ -1,0 +1,6 @@
+1. every change need to push to heroku
+-> git push heroku main
+
+2. heroku create
+
+3. heroku open
