@@ -6,13 +6,17 @@ var bodyParser = require("body-parser");
 
 var https = require("https");
 
-var port = 3000;
+var localport = 3000;
 app = express();
 app.use(express["static"]("public"));
 app.use(bodyParser.urlencoded({
   extended: true
 }));
-app.listen(port, function (req, res) {
+/**
+ * listen to the Heroku port or the localhost
+ */
+
+app.listen(process.env.PORT || localport, function (req, res) {
   console.log("The server is connected to port: " + port);
 });
 app.get("/", function (req, res) {
@@ -28,6 +32,7 @@ app.get("/", function (req, res) {
  */
 
 app.post("/", function (req, res) {
+  //console.log(typeof(res.statusCode));
   var firstName = req.body.firstName;
   var lastName = req.body.lastName;
   var email = req.body.email; //the url is composed of the url and the list id
@@ -39,7 +44,8 @@ app.post("/", function (req, res) {
 
   var options = {
     method: "POST",
-    auth: "GuanXin:9672dd01ae066c25b4231a9c908a51ef-us7"
+    //api key: account -> Extras -> API keys
+    auth: "GuanXin:46a61c2f47ce7ed9b7c2e31868924930-us7"
   }; //data matches the signup page with email and its status, merge_fields
   //merge_fields (audience -> settings -> Audience fields and Merge tags)
 
@@ -67,6 +73,16 @@ app.post("/", function (req, res) {
   var request = https.request(url, options, function (response) {
     response.on("data", function (data) {
       console.log(JSON.parse(data));
+
+      if (response.statusCode == 200) {
+        res.sendFile(__dirname + "/success.html");
+      } else {
+        res.sendFile(__dirname + "/failure.html"); //the route must be the same in the failure.html
+
+        app.post("/failure", function (req, res) {
+          res.redirect("/");
+        });
+      }
     });
   }); //the request write the jsonData to the Mailchimp and end it
 

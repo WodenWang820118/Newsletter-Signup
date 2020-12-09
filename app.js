@@ -1,7 +1,7 @@
 const express = require("express");
 const bodyParser = require("body-parser");
 const https = require("https");
-const port = 3000;
+const localport = 3000;
 
 app = express();
 
@@ -9,7 +9,10 @@ app.use(express.static("public"));
 
 app.use(bodyParser.urlencoded({extended:true}));
 
-app.listen(port, function(req, res){
+/**
+ * listen to the Heroku port or the localhost
+ */
+app.listen(process.env.PORT || localport, function(req, res){
     console.log("The server is connected to port: " + port);
 });
 
@@ -26,6 +29,8 @@ app.get("/", function(req, res){
  * 5. post the request to the Mailchimp server; use the response to see the information vis our own server
  */
 app.post("/", function(req, res){
+    //console.log(typeof(res.statusCode));
+
     const firstName = req.body.firstName;
     const lastName = req.body.lastName;
     const email = req.body.email;
@@ -38,7 +43,8 @@ app.post("/", function(req, res){
     //method using post because we post the data to the Mailchimp server, and send the request
     const options = {
         method: "POST",
-        auth: "GuanXin:9672dd01ae066c25b4231a9c908a51ef-us7"
+        //api key: account -> Extras -> API keys
+        auth: "GuanXin:46a61c2f47ce7ed9b7c2e31868924930-us7"
     }
 
     //data matches the signup page with email and its status, merge_fields
@@ -70,6 +76,16 @@ app.post("/", function(req, res){
     const request = https.request(url, options, function(response){
         response.on("data", function(data){
             console.log(JSON.parse(data));
+
+            if (response.statusCode==200){
+                res.sendFile(__dirname + "/success.html");
+            } else {
+                res.sendFile(__dirname + "/failure.html");
+                //the route must be the same in the failure.html
+                app.post("/failure", function(req, res){
+                    res.redirect("/");
+                });
+            }
         })
     });
 
