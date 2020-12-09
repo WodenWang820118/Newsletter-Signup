@@ -17,7 +17,7 @@ app.use(bodyParser.urlencoded({
  */
 
 app.listen(process.env.PORT || localport, function (req, res) {
-  console.log("The server is connected to port: " + port);
+  console.log("The server is connected to port: " + localport);
 });
 app.get("/", function (req, res) {
   res.sendFile(__dirname + "/signup.html");

@@ -13,7 +13,7 @@ app.use(bodyParser.urlencoded({extended:true}));
  * listen to the Heroku port or the localhost
  */
 app.listen(process.env.PORT || localport, function(req, res){
-    console.log("The server is connected to port: " + port);
+    console.log("The server is connected to port: " + localport);
 });
 
 app.get("/", function(req, res){
